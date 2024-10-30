@@ -1,3 +1,4 @@
+import 'package:caching_lec/secure_storage_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,6 +47,32 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Other caching examples'),
+            ),
+            ListTile(
+              title: const Text('Secure Storage'),
+              leading: const Icon(Icons.security),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomePageSecureStorage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ) ,
       appBar: AppBar(
         title: const Text('Persistence'),
       ),
