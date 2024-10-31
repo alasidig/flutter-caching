@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
 
+import 'http_caching_page.dart';
 import 'objectbox.g.dart';
 import 'objectbox_page.dart';
 Future<void> storeData() async {
@@ -32,8 +33,12 @@ initObjectBox() async {
   );
   print('saving to ${path.join(docDir.path, 'objectbox')}');
 }
+late ApiClient apiClient;
+
+
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
+  apiClient = ApiClient();
   await initObjectBox();
   runApp(const MyApp());
 }
@@ -109,6 +114,19 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>  HomePageObjectBox(store: store,),
+                  ),
+                );
+              }
+            ),
+            ListTile(
+              title: const Text('HTTP Caching'),
+              leading: const Icon(Icons.cloud),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePageHTTPCache(apiClient: apiClient,),
                   ),
                 );
               }
