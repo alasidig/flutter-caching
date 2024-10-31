@@ -66,6 +66,10 @@ class _HomePageObjectBoxState extends State<HomePageObjectBox> {
     petBox.put(pet);
     getPersons();
   }
+  deletePet(Pet pet) {
+    petBox.remove(pet.id);
+    getPersons();
+  }
 
   final formKey = GlobalKey<FormState>();
 
@@ -73,15 +77,16 @@ class _HomePageObjectBoxState extends State<HomePageObjectBox> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ObjectBox'),
+        title: const Text('Persistence'),
       ),
       body: ListView(padding: const EdgeInsets.all(16), children: [
-        AddNameForm(label: 'Person Name', onSubmit: addPerson  ),
+        AddNameForm(label: 'Person Name', onSubmit: addPerson),
         const SizedBox(height: 20),
         const TextBoxWithBackground(
             text: 'Table of Persons', backgroundColor: Colors.green),
         //create a data table to show the list of persons
         DataTable(
+          columnSpacing: 1,
           columns: const [
             DataColumn(label: Text('ID')),
             DataColumn(label: Text('Name')),
@@ -92,21 +97,46 @@ class _HomePageObjectBoxState extends State<HomePageObjectBox> {
               .map((person) => DataRow(cells: [
                     DataCell(Text(person.id.toString())),
                     DataCell(Text(person.name)),
-                    DataCell(Text(person.pets.length.toString())),
+                    DataCell(Text(person.pets.length.toString()), onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                                title: TextBoxWithBackground(
+                                  text: '${person.name} Pets',
+                                  backgroundColor: Colors.blue,
+                                ),
+                                actions: [IconButton(onPressed: () {
+                                  Navigator.of(context).pop();
+                                }, icon: const Icon(Icons.close)) ],
+                                content: SizedBox(
+                                  height: 300,
+                                  width: 300,
+                                  child: PersonPetsList(
+                                      pets: person.pets,
+                                      onDelete: (pet) {
+                                        deletePet(pet);
+                                      }),
+                                ));
+                          });
+                    }),
                     DataCell(IconButton(
                       onPressed: () {
-                        showDialog(context: context, builder: (context) {
-                          return SimpleDialog(
-                            title: const Text('Add a Pet'),
-                            children: [AddNameForm(
-                              label: 'Pet Name',
-                              onSubmit: (petName) {
-                                addPet(person, petName);
-                                Navigator.of(context).pop();
-                              },
-                            )]
-                          );
-                        });
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return SimpleDialog(
+                                  title: const Text('Add a Pet'),
+                                  children: [
+                                    AddNameForm(
+                                      label: 'Pet Name',
+                                      onSubmit: (petName) {
+                                        addPet(person, petName);
+                                        Navigator.of(context).pop();
+                                      },
+                                    )
+                                  ]);
+                            });
                       },
                       icon: const Icon(Icons.pets_rounded),
                     )),
@@ -117,5 +147,31 @@ class _HomePageObjectBoxState extends State<HomePageObjectBox> {
     );
   }
 }
+
+class PersonPetsList extends StatelessWidget {
+  const PersonPetsList({super.key, required this.pets, required this.onDelete});
+
+  final List<Pet> pets;
+  final void Function(Pet) onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        shrinkWrap: true,
+        itemCount: pets.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+              title: Text(pets[index].name),
+              trailing: IconButton(
+                onPressed: () {
+                  onDelete(pets[index]);
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.delete),
+              ));
+        });
+  }
+}
+
 
 
