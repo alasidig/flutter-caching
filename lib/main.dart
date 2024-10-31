@@ -1,8 +1,13 @@
 import 'package:caching_lec/chached_image_page.dart';
 import 'package:caching_lec/secure_storage_page.dart';
 import 'package:flutter/material.dart';
+import 'package:objectbox/objectbox.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as path;
 
+import 'objectbox.g.dart';
+import 'objectbox_page.dart';
 Future<void> storeData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('Course', 'SWE463');
@@ -18,7 +23,18 @@ Future<void> clearData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('Course');
 }
-void main() {
+late Store store;
+initObjectBox() async {
+  final docDir = await getApplicationDocumentsDirectory();
+  store = Store(
+    getObjectBoxModel(),
+    directory: path.join(docDir.path, 'objectbox'),
+  );
+  print('saving to ${path.join(docDir.path, 'objectbox')}');
+}
+void main()async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initObjectBox();
   runApp(const MyApp());
 }
 
@@ -80,6 +96,19 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const HomePageCachedNetworkImage(),
+                  ),
+                );
+              }
+            ),
+            ListTile(
+              title: const Text('ObjectBox'),
+              leading: const Icon(Icons.storage),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>  HomePageObjectBox(store: store,),
                   ),
                 );
               }

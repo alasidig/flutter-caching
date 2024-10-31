@@ -37,11 +37,16 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences:
   flutter_secure_storage:
-  cached_network_image: 
+  cached_network_image:
+  objectbox:
+  objectbox_flutter_libs:
+  path_provider:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  objectbox_generator:
+  build_runner:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
